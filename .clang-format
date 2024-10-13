@@ -1,0 +1,9 @@
+AlignTrailingComments: true
+AllowShortFunctionsOnASingleLine: All
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+IndentWrappedFunctionNames: true
+IndentWidth: 4
+SortIncludes: false
+NamespaceIndentation: All
+
