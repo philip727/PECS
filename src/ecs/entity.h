@@ -5,7 +5,7 @@
 #include <stdbool.h>
 
 #define NAME_COMPONENT_TYPE "component::name"
-#define ComponentType char*
+typedef char* ComponentType;
 
 typedef struct {
     char* data;
