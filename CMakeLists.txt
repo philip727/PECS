@@ -8,10 +8,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-delayed-template-parsing")
 
 set(SOURCE_FILES 
     src/main.c
-    src/ecs/ecs.c
     src/ecs/world.c
     src/ecs/entity.c
     src/ecs/query.c
+    src/ecs/systems.c
 )
 
 add_executable(ecs_arch ${SOURCE_FILES})
