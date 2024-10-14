@@ -6,13 +6,15 @@ typedef struct {
     ComponentData** components;
     size_t amountOfComponents;
     Entity* entity;
-} QueryEntry;
+    size_t entityId;
+} QueryResultEntry;
 
 typedef struct {
-    size_t amountOfEntries;
-    QueryEntry * entries;
+    size_t amountOfResults;
+    QueryResultEntry * entries;
 } QueryResult;
 
+bool query_result_is_empty(QueryResult queryResult);
 void query_result_cleanup(QueryResult* queryResult);
 
 typedef struct {
@@ -20,6 +22,6 @@ typedef struct {
     ComponentType * componentTypes;
 } Query;
 
-bool query_is_empty(Query* query);
+bool query_is_empty(Query query);
 
 #endif // !_QUERY_HEADER_H
