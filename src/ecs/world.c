@@ -11,13 +11,13 @@ void world_alloc(World *world) { entity_table_alloc(&world->entities); }
 
 QueryResult world_query(World *world, Query query) {
     QueryResult result = {
-        .amountOfEntries = 0,
-        .entries = (QueryEntry *)malloc(sizeof(QueryEntry)),
+        .amountOfResults = 0,
+        .entries = (QueryResultEntry *)malloc(sizeof(QueryResultEntry)),
     };
 
     for (size_t i = 0; i < world->entities.size; i++) {
         Entity *entity = world_get_entity(world, i);
-        QueryEntry entry = {
+        QueryResultEntry entry = {
             // Since we should only find the same amount of components as we
             // asked for then we should be able to just allocate the exact size
             // needed
@@ -25,6 +25,7 @@ QueryResult world_query(World *world, Query query) {
             .entity = entity,
             .components = (ComponentData **)malloc(query.amountOfComponents *
                                                    sizeof(ComponentData *)),
+            .entityId = i,
         };
 
         bool dontAdd = false;
@@ -44,13 +45,14 @@ QueryResult world_query(World *world, Query query) {
             continue;
         }
 
-        result.amountOfEntries++;
-        result.entries = (QueryEntry *)realloc(
-            result.entries, result.amountOfEntries * sizeof(QueryEntry));
+        // Allocate more space for the amount of entries
+        result.amountOfResults++;
+        result.entries = (QueryResultEntry *)realloc(
+            result.entries, result.amountOfResults * sizeof(QueryResultEntry));
 
         // Copy the query entry into the array
-        memcpy(&result.entries[result.amountOfEntries - 1], &entry,
-               sizeof(QueryEntry));
+        memcpy(&result.entries[result.amountOfResults - 1], &entry,
+               sizeof(QueryResultEntry));
     }
 
     return result;
@@ -70,6 +72,17 @@ size_t world_create_empty_entity(World *world) {
 void world_insert_component(const World *world, size_t entityId,
                             ComponentData data) {
     Entity *entity = &world->entities.table[entityId];
+    for (size_t i = 0; i < entity->amountOfComponents; i++) {
+        if (strcmp(entity->components[i].type, data.type) == 0) {
+            printf(
+                "Can not insert two components of the same type on an Entity\n\
+Attempted to insert %s on Entity %llu which already has %s\n",
+                data.type, entityId, data.type);
+
+            return;
+        }
+    }
+
     entity_alloc_component_space(entity);
     entity->components[entity->amountOfComponents - 1] = data;
 }
