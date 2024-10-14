@@ -1,5 +1,6 @@
 #include "ecs/entity.h"
 #include "ecs/query.h"
+#include "ecs/systems.h"
 #include "ecs/world.h"
 #include <stdint.h>
 #include <stdio.h>
@@ -13,60 +14,111 @@ typedef struct {
     uint32_t maxHealth;
 } CHealth;
 
-int main(int argc, char *argv[]) {
-    srand(time(NULL));
-
-    World world = {};
-    world_alloc(&world);
-
+void create_character_sys(World *world) {
     // Create a local player
-    size_t id = world_create_empty_entity(&world);
-    ComponentData component = {};
+    size_t id = world_create_empty_entity(world);
+
+    ComponentData nameComponent = {};
     CName *name = (CName *)malloc(sizeof(CName));
     name->data = "LocalActor";
-    component.data = (void *)name;
-    component.type = NAME_COMPONENT_TYPE;
-    world_insert_component(&world, id, component);
+    nameComponent.data = (void *)name;
+    nameComponent.type = NAME_COMPONENT_TYPE;
 
-    printf("AAMEOWW\n");
     ComponentData healthComponent = {};
     CHealth *health = (CHealth *)malloc(sizeof(CHealth));
     health->health = 100;
     health->maxHealth = 100;
     healthComponent.data = (void *)health;
     healthComponent.type = HEALTH_COMPONENT_TYPE;
-    world_insert_component(&world, id, healthComponent);
-    printf("MEOWW\n");
 
-    size_t idTwo = world_create_empty_entity(&world);
-    ComponentData componentTwo = {};
-    CName *nameTwo = (CName *)malloc(sizeof(CName));
-    nameTwo->data = "Actor";
-    componentTwo.data = (void *)nameTwo;
-    componentTwo.type = NAME_COMPONENT_TYPE;
-    world_insert_component(&world, idTwo, componentTwo);
+    world_insert_component(world, id, nameComponent);
+    world_insert_component(world, id, healthComponent);
+}
 
-    world_create_empty_entity(&world);
-    world_create_empty_entity(&world);
-    world_create_empty_entity(&world);
-    world_create_empty_entity(&world);
-    world_create_empty_entity(&world);
-    world_create_empty_entity(&world);
-    world_create_empty_entity(&world);
-
-    char *types[] = {NAME_COMPONENT_TYPE, HEALTH_COMPONENT_TYPE};
+void damage_health_sys(World *world) {
+    char *types[] = {HEALTH_COMPONENT_TYPE};
     Query query = {
-        .amountOfComponents = 2,
+        .amountOfComponents = 1,
         .componentTypes = types,
     };
+    QueryResult result = world_query(world, query);
 
-    QueryResult result = world_query(&world, query);
+    if (query_result_is_empty(result)) {
+        query_result_cleanup(&result);
+        return;
+    }
 
-    printf("%llu\n", result.amountOfEntries);
+    for (size_t i = 0; i < result.amountOfResults; i++) {
+        QueryResultEntry entry = result.entries[i];
+        CHealth *health = (CHealth *)entry.components[0]->data;
+        uint32_t damage = 10;
+
+        printf("%d\n", health->health);
+        if (damage > health->health) {
+            health->health = 0;
+            continue;
+        }
+
+        health->health -= 10;
+    }
 
     query_result_cleanup(&result);
+}
+
+void delete_zero_health_sys(World *world) {
+    char *types[] = {HEALTH_COMPONENT_TYPE};
+    Query query = {
+        .amountOfComponents = 1,
+        .componentTypes = types,
+    };
+    QueryResult result = world_query(world, query);
+
+    if (query_result_is_empty(result)) {
+        query_result_cleanup(&result);
+        return;
+    }
+
+    for (size_t i = 0; i < result.amountOfResults; i++) {
+        QueryResultEntry entry = result.entries[i];
+        CHealth *health = (CHealth *)entry.components[0]->data;
+
+        if (health->health == 0) {
+            world_remove_entity(world, entry.entityId);
+            printf("Killed enttiy\n");
+        }
+    }
+
+    query_result_cleanup(&result);
+}
+
+int main(int argc, char *argv[]) {
+    srand(time(NULL));
+
+    World world = {};
+    world_alloc(&world);
+    SystemRunner sysRunner = {};
+    system_runner_alloc(&sysRunner);
+
+    // Startup systems
+    system_runner_add_system(&sysRunner, &world, SYSTEM_SET_STARTUP,
+                             create_character_sys);
+
+    system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                             damage_health_sys);
+    system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                             delete_zero_health_sys);
+
+    // Startup systems
+    system_runner_run_startup_systems(&sysRunner, &world);
+
+    // Update systems
+    for (size_t i = 0; i < 100; i++) {
+        system_runner_run_update_systems(&sysRunner, &world);
+    }
+
+    system_runner_free(&sysRunner);
     world_cleanup(&world);
-    printf("Gracefully cleaned up world");
+    printf("Gracefully cleaned up ecs\n");
 
     return 0;
 }
