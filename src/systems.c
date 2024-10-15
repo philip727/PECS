@@ -46,7 +46,7 @@ void system_runner_run_update_systems(SystemRunner *sysRunner, World *world) {
     }
 }
 
-void system_runner_free(SystemRunner *sysRunner) {
+void system_runner_cleanup(SystemRunner *sysRunner) {
     free(sysRunner->startupSystems);
     free(sysRunner->updateSystems);
 }

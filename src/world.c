@@ -74,7 +74,7 @@ void world_insert_resource(World *world, ResourceData data) {
 
 ResourceData *world_get_resource(World *world, ResourceType type) {
     for (size_t i = 0; i < world->amountOfResources; i++) {
-        ResourceData* resource = &world->resources[i];
+        ResourceData *resource = &world->resources[i];
         if (strcmp(resource->type, type) == 0) {
             return resource;
         }
@@ -125,6 +125,10 @@ Entity *world_get_entity(const World *world, size_t entityId) {
 
 void world_cleanup(World *world) {
     entity_table_cleanup(&world->entities);
+    for (size_t i = 0; i < world->amountOfResources; i++) {
+        free((&world->resources[i])->data);
+    }
+
     free(world->resources);
     world->resources = NULL;
 }
