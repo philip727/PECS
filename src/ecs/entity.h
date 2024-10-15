@@ -5,7 +5,12 @@
 #include <stdbool.h>
 
 #define NAME_COMPONENT_TYPE "component::name"
+// A component type is the name of the component. This is required so we can
+// find the correct component and cast properly
 typedef char* ComponentType;
+
+// A pointer to a struct that holds component data
+typedef void* ComponentPtr;
 
 typedef struct {
     char* data;
@@ -13,7 +18,7 @@ typedef struct {
 
 typedef struct {
     ComponentType type;
-    void* data;
+    ComponentPtr data;
 } ComponentData;
 
 bool component_is_of_type(const ComponentData* component, const ComponentType rhs);

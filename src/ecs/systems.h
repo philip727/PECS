@@ -19,7 +19,7 @@ void system_runner_alloc(SystemRunner *sysRunner);
 void system_runner_add_system(SystemRunner* ecs, World* world, SystemSet set, SystemPtr sys);
 void system_runner_run_startup_systems(SystemRunner* sysRunner, World* world);
 void system_runner_run_update_systems(SystemRunner* sysRunner, World* world);
-void system_runner_free(SystemRunner *sysRunner);
+void system_runner_cleanup(SystemRunner *sysRunner);
 
 #define SYSTEM_SET_STARTUP "system_set::startup"
 #define SYSTEM_SET_UPDATE "system_set::update"

@@ -6,8 +6,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "query.h"
+#include "resource.h"
 
-void world_alloc(World *world) { entity_table_alloc(&world->entities); }
+void world_alloc(World *world) {
+    entity_table_alloc(&world->entities);
+
+    world->resources = (ResourceData *)malloc(sizeof(ResourceData));
+    world->amountOfResources = 0;
+}
 
 QueryResult world_query(World *world, Query query) {
     QueryResult result = {
@@ -58,6 +64,26 @@ QueryResult world_query(World *world, Query query) {
     return result;
 }
 
+void world_insert_resource(World *world, ResourceData data) {
+    world->amountOfResources++;
+    world->resources = (ResourceData *)realloc(
+        world->resources, world->amountOfResources * sizeof(ResourceData));
+
+    world->resources[world->amountOfResources - 1] = data;
+}
+
+ResourceData *world_get_resource(World *world, ResourceType type) {
+    for (size_t i = 0; i < world->amountOfResources; i++) {
+        ResourceData* resource = &world->resources[i];
+        if (strcmp(resource->type, type) == 0) {
+            return resource;
+        }
+    }
+
+    printf("Tried to get non-existent resource %s", type);
+    return NULL;
+}
+
 size_t world_create_empty_entity(World *world) {
     size_t newSize = world->entities.size + 1;
     // Increase the world entity count
@@ -84,6 +110,7 @@ Attempted to insert %s on Entity %llu which already has %s\n",
     }
 
     entity_alloc_component_space(entity);
+    ComponentData dest = entity->components[entity->amountOfComponents - 1];
     entity->components[entity->amountOfComponents - 1] = data;
 }
 
@@ -96,4 +123,8 @@ Entity *world_get_entity(const World *world, size_t entityId) {
     return &world->entities.table[entityId];
 }
 
-void world_cleanup(World *world) { entity_table_cleanup(&world->entities); }
+void world_cleanup(World *world) {
+    entity_table_cleanup(&world->entities);
+    free(world->resources);
+    world->resources = NULL;
+}
