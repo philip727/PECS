@@ -33,7 +33,24 @@ bool sdl_context_init(RSDLContext *sdlCtx) {
         return false;
     }
 
+    sdlCtx->events = (SDL_Event*)malloc(sizeof(SDL_Event));
+
     return true;
+}
+
+void sdl_context_prepare_render_scene_sys(World *world) {
+    ResourceData *sdlCtxResource = world_get_resource(world, RESOURCE_SDL_CTX);
+    RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
+
+    SDL_SetRenderDrawColor(sdlCtx->renderer, 96, 128, 255, 255);
+    SDL_RenderClear(sdlCtx->renderer);
+}
+
+void sdl_context_present_render_scene_sys(World *world) {
+    ResourceData *sdlCtxResource = world_get_resource(world, RESOURCE_SDL_CTX);
+    RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
+
+    SDL_RenderPresent(sdlCtx->renderer);
 }
 
 void sdl_context_push_events_sys(World *world) {
@@ -42,8 +59,6 @@ void sdl_context_push_events_sys(World *world) {
 
     sdlCtx->events = NULL;
     sdlCtx->amountOfEvents = 0;
-
-    sdlCtx->events = (SDL_Event *)malloc(sizeof(SDL_Event));
 
     SDL_Event event;
     while (SDL_PollEvent(&event)) {

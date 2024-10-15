@@ -123,7 +123,6 @@
 #include "systems.h"
 #include "world.h"
 #include "app.h"
-#include <stdio.h>
 #include <string.h>
 
 int main() {
@@ -153,9 +152,13 @@ int main() {
 
     // Update systems
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                             sdl_context_prepare_render_scene_sys);
+    system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              sdl_context_push_events_sys);
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              sdl_context_quit_event_sys);
+    system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                             sdl_context_present_render_scene_sys);
 
 
     // Main loop

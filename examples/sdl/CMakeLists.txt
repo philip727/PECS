@@ -3,6 +3,7 @@ project(ecs_sdl_example)
 
 set(CMAKE_C_COMPILER "gcc")
 set(CMAKE_C_FLAGS "-m64")
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(DEFINED ENV{SDL3_DIR})
     set(SDL3_DIR $ENV{SDL3_DIR})
