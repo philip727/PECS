@@ -12,6 +12,7 @@ set(SOURCE_FILES
     src/ecs/entity.c
     src/ecs/query.c
     src/ecs/systems.c
+    src/ecs/resource.c
 )
 
 add_executable(ecs_arch ${SOURCE_FILES})
