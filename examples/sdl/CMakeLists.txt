@@ -22,6 +22,8 @@ set(SOURCE_FILES
     app.c
     draw.c
     character.c
+    time.c
+    utils/math/vec2.c
 )
 
 add_executable(ecs_sdl_example ${SOURCE_FILES})

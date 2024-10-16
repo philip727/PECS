@@ -1,8 +1,10 @@
+#include "SDL3/SDL_timer.h"
 #include "systems.h"
 #include "world.h"
 #include "app.h"
 #include "character.h"
 #include "draw.h"
+#include "time.h"
 
 int main() {
     World world = {};
@@ -25,11 +27,24 @@ int main() {
     };
     world_insert_resource(&world, sdlCtxResource);
 
+    // Resources
+    RTime time = {};
+    time.now = SDL_GetPerformanceCounter();
+    time.last = 0;
+    time.deltaTime = 0;
+
+    ResourceData timeResource = {
+        .type = TIME_RESOURCE_TYPE,
+        .data = (void *)&time,
+    };
+    world_insert_resource(&world, timeResource);
+
     // Startup systems
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_STARTUP,
                              spawn_character_sys);
-
     // Update systems
+    system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                             time_update_delta_time_sys);
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              sdl_context_prepare_render_scene_sys);
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
