@@ -1,11 +1,7 @@
 #include <stdint.h>
 #include "SDL3/SDL_render.h"
 #include "world.h"
-
-typedef struct {
-    int64_t x;
-    int64_t y;
-} Vec2;
+#include "utils/math/vec2.h"
 
 #define TRANSFORM_COMPONENT_TYPE "component::transform"
 typedef struct {
