@@ -20,12 +20,14 @@ link_directories("../../build/lib")
 set(SOURCE_FILES
     main.c
     app.c
+    draw.c
+    character.c
 )
 
 add_executable(ecs_sdl_example ${SOURCE_FILES})
 
 
-    target_link_libraries(ecs_sdl_example libpecs SDL3)
+target_link_libraries(ecs_sdl_example libpecs SDL3)
 
 add_custom_command(TARGET ecs_sdl_example POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy

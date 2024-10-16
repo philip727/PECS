@@ -39,7 +39,7 @@ bool sdl_context_init(RSDLContext *sdlCtx) {
 }
 
 void sdl_context_prepare_render_scene_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, RESOURCE_SDL_CTX);
+    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     SDL_SetRenderDrawColor(sdlCtx->renderer, 96, 128, 255, 255);
@@ -47,14 +47,14 @@ void sdl_context_prepare_render_scene_sys(World *world) {
 }
 
 void sdl_context_present_render_scene_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, RESOURCE_SDL_CTX);
+    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     SDL_RenderPresent(sdlCtx->renderer);
 }
 
 void sdl_context_push_events_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, RESOURCE_SDL_CTX);
+    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     sdlCtx->events = NULL;
@@ -72,7 +72,7 @@ void sdl_context_push_events_sys(World *world) {
 }
 
 void sdl_context_quit_event_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, RESOURCE_SDL_CTX);
+    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     for (size_t i = 0; i < sdlCtx->amountOfEvents; i++) {
@@ -87,4 +87,7 @@ void sdl_context_cleanup(RSDLContext *sdlCtx) {
     SDL_Quit();
     free(sdlCtx->events);
     sdlCtx->events = NULL;
+
+    SDL_DestroyRenderer(sdlCtx->renderer);
+    SDL_DestroyWindow(sdlCtx->window);
 }

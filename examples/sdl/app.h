@@ -3,7 +3,7 @@
 #include "SDL3/SDL_video.h"
 #include "world.h"
 
-#define RESOURCE_SDL_CTX "resource::sdl"
+#define SDL_CTX_RESOURCE_TYPE "resource::sdl"
 typedef struct {
     SDL_Renderer *renderer;
     SDL_Window *window;
