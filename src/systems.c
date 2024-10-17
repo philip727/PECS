@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+
 void system_runner_alloc(SystemRunner *sysRunner) {
     sysRunner->startupSystemCount = 0;
     sysRunner->startupSystems = (SystemPtr *)malloc(sizeof(SystemPtr));

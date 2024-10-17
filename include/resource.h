@@ -1,7 +1,9 @@
 #ifndef _RESOURCE_HEADER_H
 #define _RESOURCE_HEADER_H
 
+// The identifier for the resource, this is required so you can query for it from the world.
 typedef char *ResourceType;
+// A pointer to the data held in the resource
 typedef void *ResourcePtr;
 
 typedef struct {
