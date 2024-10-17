@@ -7,32 +7,36 @@
 #include "time.h"
 
 int main() {
+    // Create the world and the system runner.
     World world = {};
     world_alloc(&world);
     SystemRunner sysRunner = {};
     system_runner_alloc(&sysRunner);
 
+    // Creates a resource that holds the SDL Context
     RSDLContext sdlCtx = {};
     sdlCtx.run = true;
 
+    // Initializes the SDL window and renderer
     if (!sdl_context_init(&sdlCtx)) {
         sdl_context_cleanup(&sdlCtx);
         return 1;
     }
 
-    // Resources
+    // Pushes the SDL context resource to the world, so we can later access in a system.
     ResourceData sdlCtxResource = {
         .type = SDL_CTX_RESOURCE_TYPE,
         .data = (void *)&sdlCtx,
     };
     world_insert_resource(&world, sdlCtxResource);
 
-    // Resources
+    // Creates a resource so we can handle delta time
     RTime time = {};
     time.now = SDL_GetPerformanceCounter();
     time.last = 0;
     time.deltaTime = 0;
 
+    // Pushes the time resource to the world, so we can later access it.
     ResourceData timeResource = {
         .type = TIME_RESOURCE_TYPE,
         .data = (void *)&time,
