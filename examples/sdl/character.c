@@ -110,4 +110,6 @@ void move_character_sys(World *world) {
                  vec2_mul_double(
                      vec2_mul_double(vec2_normalize(movementDir), speed->value),
                      deltaSeconds));
+
+        query_result_cleanup(&result);
 }
