@@ -26,7 +26,9 @@ If you wish to use this, clone the project into a directory and build with **CMa
 make sure to include the headers in your project, and link the **lib** directory from the build folder and link the libraries dll from the **bin** dir.
 
 # Example
-### SDL Rectangle Character
+### SDL Example
+https://github.com/user-attachments/assets/b2691bd4-53e3-41f5-8c10-9d5cb56d61c1
+
 [Source](https://github.com/philip727/PECS/tree/main/examples/sdl)
 
 Setup main. To initialize SDL please follow an [SDL tutorial](https://wiki.libsdl.org/SDL2/Tutorials).
