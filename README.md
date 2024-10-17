@@ -13,6 +13,13 @@ for any sort of development. I built this to understand how an ECS can be built 
 - Being able to query for the components from the entities on the world.
 - A performant and barebones ECS to create simple projects quickly.
 
+# Why ECS?
+**Entity, Component, System** architecture is very scalable and allows to build complex systems easily and efficiently.
+Entities are empty containers which hold components. Components store data and systems handle behaviour dependant on components.
+This is allows you to separate concerns across your source code allowing for cleaner, more maintable, and simpler code.
+The logic is separated from the data, and allows you to have specific behaviours for different scenarios. You will see the use of this
+in the [Examples](#Example).
+
 # Getting Started
 As this isn't intended for re-use in other projects or to be a mainstream ECS. There will be no proper getting started guide.
 If you wish to use this, clone the project into a directory and build with **CMake** using the **CMakeLists.txt** inside the root directory. Once built
@@ -23,6 +30,8 @@ make sure to include the headers in your project, and link the **lib** directory
 [Source](https://github.com/philip727/PECS/tree/main/examples/sdl)
 
 Setup main. To initialize SDL please follow an [SDL tutorial](https://wiki.libsdl.org/SDL2/Tutorials).
+Here we create resources that can be acccessed throughout all systems, this allows us to hold data that doesn't need to be singled out
+to an entity.
 ```c
 // Create the world and the system runner.
 World world = {};
@@ -85,7 +94,8 @@ typedef struct {
 } CSprite;
 ```
 
-Update sprite with correct position
+Update sprite with correct transform position. Now every entity that has a CSprite and CTransform will be 
+automatically handled without having to write anymore handling or code.
 ```c
 // Update all the sprite rects with the transform position
 void update_sprite_with_transform(World *world) {
@@ -198,7 +208,10 @@ void time_update_delta_time_sys(World *world) {
 }
 ```
 
-Moving the character
+Moving the character with a system. This allows us to separate specific behaviour for different
+components on the character. If we wanted a roll mechanic. We could add A CRoll to the entity.
+Query for CRoll and CSpeed and when a key is pressed, we can adjust the CSpeed, which in return
+will be changed for this system as well.
 ```c
 // Move the character using SDL keys
 void move_character_sys(World *world) {
@@ -266,4 +279,54 @@ void move_character_sys(World *world) {
     query_result_cleanup(&result);
 }
 
+```
+
+The system configuration for the runtime. For SDL systems, please refer to the source and SDL
+tutorials to understand why and how they work.
+```c
+// Spawns the character in the startup system set
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_STARTUP,
+                         spawn_character_sys);
+
+// Updates the delta time run in the update system set.
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         time_update_delta_time_sys);
+// Prepares the SDL render scene in the update system set.
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         sdl_context_prepare_render_scene_sys);
+// Pushes events to an array held in the SDLContext resource, and clears them, ran in the
+// update system set.
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         sdl_context_push_events_sys);
+// Handles the quit event for SDL and is run in the update system set.
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         sdl_context_quit_event_sys);
+// Moves the character based on key input from SDL.
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         move_character_sys);
+
+// Renders the sprite using the transform
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         update_sprite_with_transform);
+
+// Draws the sprites to the renderer with a blue colour
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         render_sprites_sys);
+
+// Presents the SDL render scene
+system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
+                         sdl_context_present_render_scene_sys);
+
+// Runs all the systems in the startup system set
+system_runner_run_startup_systems(&sysRunner, &world);
+// Runs all the systems in the update system set in the while loop. Until the quit
+// event is handled by SDL. 
+while (sdlCtx.run) {
+    system_runner_run_update_systems(&sysRunner, &world);
+}
+
+// We finally cleanup the sdl context
+sdl_context_cleanup(&sdlCtx);
+world_cleanup(&world);
+system_runner_cleanup(&sysRunner);
 ```

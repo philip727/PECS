@@ -43,37 +43,50 @@ int main() {
     };
     world_insert_resource(&world, timeResource);
 
-    // Startup systems
+    // Spawns the character in the startup system set
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_STARTUP,
                              spawn_character_sys);
-    // Update systems
+
+    // Updates the delta time run in the update system set.
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              time_update_delta_time_sys);
+    // Prepares the SDL render scene in the update system set.
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              sdl_context_prepare_render_scene_sys);
+    // Pushes events to an array held in the SDLContext resource, and clears them, ran in the
+    // update system set.
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              sdl_context_push_events_sys);
+    // Handles the quit event for SDL and is run in the update system set.
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              sdl_context_quit_event_sys);
-    // Moving the character
+    // Moves the character based on key input from SDL.
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              move_character_sys);
 
-    // Sprite Rendering
+    // Renders the sprite using the transform
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              update_sprite_with_transform);
+
+    // Draws the sprites to the renderer with a blue colour
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              render_sprites_sys);
 
+    // Presents the SDL render scene
     system_runner_add_system(&sysRunner, &world, SYSTEM_SET_UPDATE,
                              sdl_context_present_render_scene_sys);
 
-    // Runtime loop
+    // Runs all the systems in the startup system set
     system_runner_run_startup_systems(&sysRunner, &world);
+    // Runs all the systems in the update system set in the while loop. Until the quit
+    // event is handled by SDL. 
     while (sdlCtx.run) {
         system_runner_run_update_systems(&sysRunner, &world);
     }
 
+    // We finally cleanup the sdl context
     sdl_context_cleanup(&sdlCtx);
+    world_cleanup(&world);
+    system_runner_cleanup(&sysRunner);
     return 0;
 }
