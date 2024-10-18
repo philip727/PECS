@@ -23,6 +23,10 @@ QueryResult world_query(World *world, Query query) {
 
     for (size_t i = 0; i < world->entities.size; i++) {
         Entity *entity = world_get_entity(world, i);
+        if (entity == NULL) {
+            continue;
+        };
+
         QueryResultEntry entry = {
             // Since we should only find the same amount of components as we
             // asked for then we should be able to just allocate the exact size
@@ -115,11 +119,19 @@ Attempted to insert %s on Entity %llu which already has %s\n",
 }
 
 void world_remove_entity(World *world, size_t entityId) {
+    if (entityId > world->entities.size) {
+        return;
+    };
+
     entity_cleanup(&world->entities.table[entityId]);
     entity_table_remove(&world->entities, entityId);
 }
 
 Entity *world_get_entity(const World *world, size_t entityId) {
+    if (entityId > world->entities.size) {
+        return NULL;
+    };
+
     return &world->entities.table[entityId];
 }
 
