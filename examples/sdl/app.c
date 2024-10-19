@@ -6,6 +6,7 @@
 #include "SDL3/SDL_video.h"
 #include "world.h"
 #include <stdlib.h>
+#define __STDC_WANT_LIB_EXT1__ 1
 #include <string.h>
 
 bool sdl_context_init(RSDLContext *sdlCtx) {
@@ -33,13 +34,14 @@ bool sdl_context_init(RSDLContext *sdlCtx) {
         return false;
     }
 
-    sdlCtx->events = (SDL_Event*)malloc(sizeof(SDL_Event));
+    sdlCtx->events = (SDL_Event *)malloc(sizeof(SDL_Event));
 
     return true;
 }
 
 void sdl_context_prepare_render_scene_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
+    ResourceData *sdlCtxResource =
+        world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     SDL_SetRenderDrawColor(sdlCtx->renderer, 96, 128, 255, 255);
@@ -47,14 +49,16 @@ void sdl_context_prepare_render_scene_sys(World *world) {
 }
 
 void sdl_context_present_render_scene_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
+    ResourceData *sdlCtxResource =
+        world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     SDL_RenderPresent(sdlCtx->renderer);
 }
 
 void sdl_context_push_events_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
+    ResourceData *sdlCtxResource =
+        world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     sdlCtx->events = NULL;
@@ -66,13 +70,14 @@ void sdl_context_push_events_sys(World *world) {
         sdlCtx->events = (SDL_Event *)realloc(
             sdlCtx->events, sdlCtx->amountOfEvents * sizeof(SDL_Event));
 
-        memcpy_s(&sdlCtx->events[sdlCtx->amountOfEvents - 1], sizeof(SDL_Event),
-                 &event, sizeof(SDL_Event));
+        memcpy(&sdlCtx->events[sdlCtx->amountOfEvents - 1], &event,
+               sizeof(SDL_Event));
     }
 }
 
 void sdl_context_quit_event_sys(World *world) {
-    ResourceData *sdlCtxResource = world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
+    ResourceData *sdlCtxResource =
+        world_get_resource(world, SDL_CTX_RESOURCE_TYPE);
     RSDLContext *sdlCtx = (RSDLContext *)sdlCtxResource->data;
 
     for (size_t i = 0; i < sdlCtx->amountOfEvents; i++) {

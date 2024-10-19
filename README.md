@@ -161,7 +161,7 @@ void spawn_character_sys(World *world) {
     CSprite *sprite = (CSprite *)malloc(sizeof(CSprite));
     sprite->rect = (SDL_FRect *)malloc(sizeof(SDL_FRect));
     // Copy the rect into the allocated space for the rect
-    memcpy_s(sprite->rect, sizeof(SDL_FRect), &rect, sizeof(SDL_FRect));
+    memcpy(sprite->rect, &rect, sizeof(SDL_FRect));
 
     // We MUST declare the component type or else we can't query for it
     spriteComponent.type = SPRITE_COMPONENT_TYPE;
